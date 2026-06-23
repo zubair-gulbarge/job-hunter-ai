@@ -1,0 +1,300 @@
+/* BASE SETUP */
+:root {
+  background-color: #f4f7f6;
+}
+
+html, body, #root {
+  width: 100%;
+  min-height: 100vh;
+  margin: 0;
+  padding: 0;
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+  color: #333;
+}
+
+/* MAIN CONTAINER - Utilizing the full width */
+.container {
+  width: 95%;
+  max-width: 1600px; /* Expands much wider on large screens */
+  margin: 30px auto; /* Centers the app */
+  padding: 40px;
+  background: white;
+  border-radius: 10px;
+  box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+  box-sizing: border-box; 
+}
+
+/* HEADER & TABS */
+header {
+  display: flex;
+  flex-direction: column;
+  align-items: center; /* Centers the title and tabs */
+  margin-bottom: 30px;
+}
+
+header h1 {
+  color: #2c3e50;
+  margin-top: 0;
+  margin-bottom: 20px;
+  font-size: 2.5rem;
+}
+
+.tabs {
+  display: flex;
+  justify-content: center;
+  gap: 20px;
+  width: 100%;
+  border-bottom: 2px solid #ecf0f1;
+  padding-bottom: 10px;
+}
+
+.tabs button {
+  background: transparent; /* Removes Vite's default button background */
+  color: #7f8c8d;
+  font-weight: 500;
+  font-size: 16px;
+  padding: 10px 20px;
+  border: none;
+  border-bottom: 3px solid transparent;
+  border-radius: 0;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  width: auto;
+}
+
+.tabs button.active {
+  color: #2c3e50;
+  font-weight: bold;
+  border-bottom: 3px solid #3498db;
+  background: transparent;
+}
+
+.tabs button:hover:not(.active) {
+  color: #3498db;
+  background: transparent;
+}
+
+/* INPUTS, FORMS & SEARCH BARS (Forcing clean, white backgrounds) */
+input, textarea, select {
+  background-color: #ffffff;
+  color: #333333;
+  border: 1px solid #bdc3c7;
+  border-radius: 5px;
+  font-size: 15px;
+  box-sizing: border-box;
+  font-family: inherit;
+}
+
+input::placeholder, textarea::placeholder {
+  color: #95a5a6;
+}
+
+textarea {
+  width: 100%;
+  padding: 15px;
+  resize: vertical;
+  margin-bottom: 20px;
+}
+
+textarea:focus, input:focus, select:focus {
+  outline: none;
+  border-color: #3498db;
+  box-shadow: 0 0 5px rgba(52, 152, 219, 0.2);
+}
+
+/* GLOBAL BUTTONS */
+button {
+  background-color: #3498db;
+  color: white;
+  border: none;
+  padding: 15px 25px;
+  font-size: 16px;
+  font-weight: bold;
+  border-radius: 5px;
+  cursor: pointer;
+  transition: background-color 0.3s;
+}
+
+button:hover:not(:disabled) {
+  background-color: #2980b9;
+}
+
+button:disabled {
+  background-color: #95a5a6;
+  cursor: not-allowed;
+}
+
+/* GENERATOR FORM SPECIFICS */
+.generator-form p {
+  text-align: center;
+  color: #7f8c8d;
+  margin-bottom: 25px;
+  font-size: 16px;
+}
+
+.generator-form .form-row {
+  display: flex;
+  gap: 15px;
+  margin-bottom: 15px;
+}
+
+.generator-form .form-row input {
+  flex: 1;
+  padding: 15px;
+}
+
+/* KANBAN BOARD & TRACKER */
+.tracker-container h2 {
+  text-align: center;
+  color: #2c3e50;
+  margin-bottom: 20px;
+}
+
+.search-bar {
+  width: 100%;
+  padding: 15px;
+  margin-bottom: 25px;
+  border: 2px solid #ecf0f1;
+  border-radius: 8px;
+  font-size: 16px;
+  transition: border-color 0.3s;
+}
+
+.add-app-form {
+  display: flex;
+  gap: 15px;
+  margin-bottom: 30px;
+  background: #f8f9fa;
+  padding: 20px;
+  border-radius: 8px;
+  border: 1px solid #e9ecef;
+}
+
+.add-app-form input {
+  flex: 1;
+  padding: 12px;
+}
+
+.add-app-form button {
+  width: auto;
+  padding: 12px 25px;
+  white-space: nowrap;
+}
+
+/* COLUMNS */
+.kanban-board {
+  display: flex;
+  gap: 20px;
+  overflow-x: auto; 
+  padding-bottom: 20px;
+  min-height: 55vh; 
+}
+
+.kanban-column {
+  flex: 1;
+  min-width: 260px; /* Ensures columns stay wide and readable */
+  background-color: #f4f7f6; 
+  border-radius: 8px;
+  padding: 15px;
+  display: flex;
+  flex-direction: column;
+}
+
+.kanban-column h3 {
+  font-size: 14px;
+  text-transform: uppercase;
+  color: #7f8c8d;
+  text-align: center;
+  margin-top: 0;
+  border-bottom: 3px solid #bdc3c7;
+  padding-bottom: 10px;
+  margin-bottom: 15px;
+}
+
+/* CARDS */
+.kanban-cards {
+  display: flex;
+  flex-direction: column;
+  gap: 15px;
+}
+
+.kanban-card {
+  background: white;
+  padding: 15px;
+  border-radius: 8px;
+  box-shadow: 0 2px 5px rgba(0,0,0,0.08);
+  border-left: 5px solid #3498db;
+  display: flex;
+  flex-direction: column;
+}
+
+.kanban-card h4 {
+  margin: 0 0 5px 0;
+  color: #2c3e50;
+  font-size: 16px;
+}
+
+.kanban-card p {
+  margin: 0 0 10px 0;
+  font-size: 14px;
+  color: #34495e;
+}
+
+.kanban-card small {
+  display: block;
+  margin-bottom: 8px;
+  color: #95a5a6;
+}
+
+.kanban-card select {
+  width: 100%;
+  padding: 8px;
+  border-radius: 4px;
+  border: 1px solid #bdc3c7;
+  font-size: 13px;
+  font-weight: 600;
+  margin-top: auto; 
+  cursor: pointer;
+}
+
+.delete-btn {
+  background-color: #e74c3c;
+  color: white;
+  border: none;
+  padding: 8px 10px;
+  font-size: 13px;
+  border-radius: 4px;
+  cursor: pointer;
+  margin-top: 10px;
+  width: 100%;
+  transition: background-color 0.2s;
+}
+
+.delete-btn:hover { 
+  background-color: #c0392b; 
+}
+
+/* PROFILE SETTINGS SPECIFICS */
+.form-group {
+  margin-bottom: 20px;
+  text-align: left;
+}
+
+.form-group label {
+  display: block;
+  margin-bottom: 8px;
+  font-weight: 600;
+  color: #34495e;
+}
+
+.form-group input {
+  padding: 12px;
+}
+
+.status-message {
+  margin-top: 20px;
+  font-weight: bold;
+  color: #27ae60;
+  text-align: center;
+  font-size: 16px;
+}

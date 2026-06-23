@@ -1,4 +1,7 @@
 from fastapi import FastAPI, HTTPException
+from fastapi.middleware.cors import CORSMiddleware  # <-- NEW IMPORT
+# ... (your other imports stay the same)
+from fastapi import FastAPI, HTTPException
 from pydantic import BaseModel
 from app.services.llm_service import tailor_resume_content
 from app.models.profile import ProfileModel
@@ -11,46 +14,76 @@ from fastapi.responses import FileResponse
 from app.services.pdf_service import generate_pdf_from_data
 
 app = FastAPI(title="Job Hunter AI")
+# --- NEW: CORS Configuration ---
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=["http://localhost:5173"],  # Allows your Vite React app to connect
+    allow_credentials=True,
+    allow_methods=["*"],  # Allows all methods (GET, POST, PUT, etc.)
+    allow_headers=["*"],  # Allows all headers
+)
 
 class TailorRequest(BaseModel):
     master_resume: str
     job_description: str
 
-# @app.post("/api/tailor-resume")
-# async def generate_tailored_resume(request: TailorRequest):
-#     try:
-#         tailored_text = tailor_resume_content(
-#             master_resume=request.master_resume,
-#             job_description=request.job_description
-#         )
-#         return {"status": "success", "tailored_resume": tailored_text}
-#     except Exception as e:
-#         raise HTTPException(status_code=500, detail=str(e))
 @app.post("/api/tailor-resume", response_class=FileResponse)
 async def generate_tailored_resume(request: TailorRequest):
     try:
-        # 1. Ask the AI to tailor the text based on the Master Resume and JD
-        tailored_text = tailor_resume_content(
-            master_resume=request.master_resume,
-            job_description=request.job_description
-        )
-        
-        # 2. Package the data for the template (In a full implementation, 
-        # the AI should return structured JSON so you can map these fields perfectly)
+        # 1. Fetch the actual Master Profile from MongoDB
+        profile = await profiles_collection.find_one({}, {"_id": 0})
+        if not profile:
+            raise HTTPException(status_code=400, detail="Master profile not found. Please save your profile first.")
+
+        # 2. Format the experience data cleanly for the HTML template
+        experience_html = ""
+        if "experience" in profile and profile["experience"]:
+            for exp in profile["experience"]:
+                experience_html += f"""
+                <div class="item-header">
+                    <span>{exp.get('company', '')}</span>
+                    <span>{exp.get('duration', '')}</span>
+                </div>
+                <div class="item-subheader">
+                    <span>{exp.get('role', '')}</span>
+                </div>
+                <ul><li>{exp.get('description', '')}</li></ul>
+                """
+
+        # 3. Format the projects data
+        projects_html = ""
+        if "projects" in profile and profile["projects"]:
+            for proj in profile["projects"]:
+                projects_html += f"""
+                <div class="item-header">
+                    <span>{proj.get('title', '')}</span>
+                    <span></span>
+                </div>
+                <div class="item-subheader">
+                    <span>Technologies: {proj.get('technologies', '')}</span>
+                </div>
+                <ul><li>{proj.get('description', '')}</li></ul>
+                """
+
+        # 4. Format the skills array back into a readable string
+        skills_string = ", ".join(profile.get("skills", []))
+
+        # 5. Build the data package for the PDF Template (Harvard Style)
         resume_data = {
-            "name": "Zubair Gulbarge",
-            "email": "zubairgulbarge@gmail.com",
-            "phone": "+91 9833698785",
-            "portfolio_url": "zubairlearntech.com",
-            "summary": "Cloud and DevOps professional tailored for this specific role.",
-            "skills": "AWS (IAM, RDS, S3), Python, Docker, FastAPI",
-            "experience_html": f"<div>{tailored_text}</div>"
+            "name": profile.get("name", ""),
+            "email": profile.get("email", ""),
+            "phone": profile.get("phone", ""),
+            "portfolio_url": "github.com/zubairgulbarge",
+            "summary": profile.get("summary", ""),
+            "skills": skills_string,
+            "experience_html": experience_html,
+            "projects_html": projects_html,
+            "education": profile.get("academics", [{}])[0] if profile.get("academics") else None
         }
         
-        # 3. Generate the PDF
+        # 6. Generate the PDF using the template
         pdf_file_path = generate_pdf_from_data(resume_data)
         
-        # 4. Return the file as a downloadable attachment
         return FileResponse(
             path=pdf_file_path, 
             filename="Zubair_Tailored_Resume.pdf", 
@@ -126,5 +159,15 @@ async def update_application_status(app_id: str, new_status: ApplicationStatus):
         if result.modified_count == 0:
             raise HTTPException(status_code=404, detail="Application not found or status unchanged.")
         return {"status": "success", "message": f"Status updated to {new_status}"}
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
+    
+@app.delete("/api/applications/{app_id}")
+async def delete_application(app_id: str):
+    try:
+        result = await applications_collection.delete_one({"_id": ObjectId(app_id)})
+        if result.deleted_count == 0:
+            raise HTTPException(status_code=404, detail="Application not found.")
+        return {"status": "success", "message": "Application deleted."}
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))

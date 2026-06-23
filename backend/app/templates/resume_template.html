@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <style>
+        @page { size: letter; margin: 0.5in; }
+        body { font-family: 'Times New Roman', Times, serif; font-size: 11pt; color: #000; line-height: 1.2; }
+        
+        /* Header */
+        .header { text-align: center; margin-bottom: 10px; }
+        .name { font-size: 24pt; font-weight: normal; margin-bottom: 2px; }
+        .contact { font-size: 11pt; margin-bottom: 10px; }
+        .contact a { color: #000; text-decoration: none; }
+        
+        /* Sections */
+        .section-title { font-size: 11pt; font-weight: bold; text-transform: uppercase; border-bottom: 1px solid #000; margin-top: 15px; margin-bottom: 5px; }
+        
+        /* Content formatting */
+        .item-header { display: flex; justify-content: space-between; font-weight: bold; margin-top: 5px; }
+        .item-subheader { display: flex; justify-content: space-between; font-style: italic; margin-bottom: 3px; }
+        
+        ul { margin-top: 3px; margin-bottom: 5px; padding-left: 20px; }
+        li { margin-bottom: 3px; text-align: justify; }
+        
+        .skills-content { margin-top: 5px; }
+        .skills-content strong { font-weight: bold; }
+    </style>
+</head>
+<body>
+
+    <div class="header">
+        <div class="name">{{ name | upper }}</div>
+        <div class="contact">
+            {{ email }} | {{ phone }} | {{ portfolio_url }}
+        </div>
+    </div>
+
+    {% if summary %}
+    <div class="section-title">Professional Summary</div>
+    <div class="skills-content">{{ summary }}</div>
+    {% endif %}
+
+    {% if experience_html %}
+    <div class="section-title">Experience</div>
+    {{ experience_html | safe }}
+    {% endif %}
+
+    {% if projects_html %}
+    <div class="section-title">Projects</div>
+    {{ projects_html | safe }}
+    {% endif %}
+
+    {% if education %}
+    <div class="section-title">Education</div>
+    <div class="item-header">
+        <span>{{ education.institution }}</span>
+        <span>{{ education.graduation_year }}</span>
+    </div>
+    <div class="item-subheader">
+        <span>{{ education.degree }}</span>
+    </div>
+    {% endif %}
+
+    {% if skills %}
+    <div class="section-title">Technical Skills</div>
+    <div class="skills-content">
+        {{ skills }}
+    </div>
+    {% endif %}
+
+</body>
+</html>

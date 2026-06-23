@@ -1,9 +1,7 @@
-from pydantic import BaseModel, Field
+from pydantic import BaseModel, Field, ConfigDict
 from typing import Optional
-from datetime import datetime
 from enum import Enum
 
-# Define strict statuses for the frontend Kanban board
 class ApplicationStatus(str, Enum):
     PREPARING = "Preparing"
     APPLIED = "Applied"
@@ -12,19 +10,22 @@ class ApplicationStatus(str, Enum):
     REJECTED = "Rejected"
 
 class ApplicationModel(BaseModel):
-    company_name: str = Field(..., example="Amazon Web Services")
-    job_title: str = Field(..., example="Cloud Architect")
-    job_description: str = Field(..., example="Requires expertise in IAM, RDS, and scalable infrastructure...")
-    tailored_resume_text: Optional[str] = Field(None, description="The AI-generated resume used for this job")
+    company_name: str = Field(..., json_schema_extra={"example": "Amazon Web Services"})
+    job_title: str = Field(..., json_schema_extra={"example": "Cloud Architect"})
+    source: Optional[str] = Field(default="Direct Website", json_schema_extra={"example": "LinkedIn"})
+    job_description: str = Field(..., json_schema_extra={"example": "Requires expertise in IAM, RDS, and scalable infrastructure..."})
     status: ApplicationStatus = Field(default=ApplicationStatus.PREPARING)
-    applied_date: Optional[datetime] = Field(default_factory=datetime.utcnow)
 
-    class Config:
-        json_schema_extra = {
+    model_config = ConfigDict(
+        populate_by_name=True,
+        arbitrary_types_allowed=True,
+        json_schema_extra={
             "example": {
-                "company_name": "Tech Corp",
-                "job_title": "Platform Engineer",
-                "job_description": "Paste the full JD here...",
+                "company_name": "Amazon Web Services",
+                "job_title": "Cloud Architect",
+                "source": "LinkedIn",
+                "job_description": "Requires expertise in IAM, RDS, and scalable infrastructure...",
                 "status": "Preparing"
             }
         }
+    )

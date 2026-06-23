@@ -1,26 +1,28 @@
-from pydantic import BaseModel, Field
+from pydantic import BaseModel, Field, ConfigDict
 from typing import List, Optional
 
 class ProjectSchema(BaseModel):
-    title: str = Field(..., example="CloudBox")
-    description: str = Field(..., example="Secure multi-user file management application using Python and Flask.")
-    technologies: List[str] = Field(..., example=["Python", "Flask", "Docker", "MongoDB"])
+    title: str = Field(..., json_schema_extra={"example": "CloudBox"})
+    description: str = Field(..., json_schema_extra={"example": "Secure multi-user file management application using Python and Flask."})
+    technologies: List[str] = Field(..., json_schema_extra={"example": ["Python", "Flask", "Docker", "MongoDB"]})
 
 class AcademicSchema(BaseModel):
-    degree: str = Field(..., example="Bachelor of Technology in Computer Science")
-    institution: str = Field(..., example="University Name")
-    graduation_year: str = Field(..., example="2025")
+    degree: str = Field(..., json_schema_extra={"example": "Bachelor of Technology in Computer Science"})
+    institution: str = Field(..., json_schema_extra={"example": "University Name"})
+    graduation_year: str = Field(..., json_schema_extra={"example": "2025"})
 
 class ProfileModel(BaseModel):
-    name: str = Field(..., example="Zubair")
-    email: str = Field(..., example="zubair@example.com")
-    phone: Optional[str] = Field(None, example="+91 9876543210")
-    skills: List[str] = Field(..., example=["Python", "AWS", "Docker", "Terraform"])
-    academics: List[AcademicSchema]
-    projects: List[ProjectSchema]
+    name: str = Field(..., json_schema_extra={"example": "Zubair"})
+    email: str = Field(..., json_schema_extra={"example": "zubair@example.com"})
+    phone: Optional[str] = Field(None, json_schema_extra={"example": "+91 9876543210"})
+    skills: List[str] = Field(..., json_schema_extra={"example": ["Python", "AWS", "Docker", "Terraform"]})
+    academics: List[AcademicSchema] = Field(default_factory=list)
+    projects: List[ProjectSchema] = Field(default_factory=list)
 
-    class Config:
-        json_schema_extra = {
+    model_config = ConfigDict(
+        populate_by_name=True,
+        arbitrary_types_allowed=True,
+        json_schema_extra={
             "example": {
                 "name": "Zubair",
                 "email": "zubair@example.com",
@@ -42,3 +44,4 @@ class ProfileModel(BaseModel):
                 ]
             }
         }
+    )
